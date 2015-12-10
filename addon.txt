@@ -1,0 +1,6 @@
+"AddonInfo"
+{
+	"name" "hackershit"
+	"author_name" "Iced Coffee"
+	"info" "someshit"
+}
