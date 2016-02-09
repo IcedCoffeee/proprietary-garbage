@@ -7,7 +7,7 @@ hook.Add("PlayerInitialSpawn", "hack_initialspawm", function(ply)
 	end
 	
 	if(file.Exists("hack/players/" .. ply:SteamID64() .. ".txt", "DATA")) then
-		data = util.JSONToTable(file.Read("hack/players/" .. ply:SteamID64() .. ".txt", "DATA"))
+		local data = util.JSONToTable(file.Read("hack/players/" .. ply:SteamID64() .. ".txt", "DATA"))
 		net.Start("MyIP")
 			net.WriteString(data.ip)
 			local server = GetServer(data.ip)
@@ -20,7 +20,7 @@ end)
 
 function GetIP(ply)
 	if IsValid(ply) then
-		data = util.JSONToTable(file.Read("hack/players/" .. ply:SteamID64() .. ".txt", "DATA"))
+		local data = util.JSONToTable(file.Read("hack/players/" .. ply:SteamID64() .. ".txt", "DATA"))
 	end
 	return data.ip
 end

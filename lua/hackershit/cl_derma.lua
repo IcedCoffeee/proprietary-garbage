@@ -18,6 +18,7 @@ function LaptopGUI()
 					if node.files[i][1] == false then
 						local temp = node:AddNode(node.files[i][2])
 						temp.files = node.files[i][3]
+						temp.self = node.files[i]
 						listdir(temp)
 					end
 				end
@@ -31,7 +32,22 @@ function LaptopGUI()
 				if Server.files[i][1] == false then
 					local temp = rootfolder:AddNode(Server.files[i][2])
 					temp.files = Server.files[i][3]
+					temp.self = Server.files[i]
 					listdir(temp)
+				end
+			end
+			function FileTree:DoRightClick(node)
+				if node != rootfolder then
+				local Menu = DermaMenu()
+					local SubMenu = Menu:AddSubMenu("New")
+						SubMenu:AddOption("File", function() NewFile(node) end)
+						SubMenu:AddOption("Folder", function() NewFolder(node) end)
+					Menu:AddSpacer()
+					Menu:AddOption("Rename", function() RenameGUI(node.self, node) end)
+					Menu:AddOption("Copy")
+					Menu:AddOption("Cut")
+					Menu:AddOption("Delete")
+					Menu:Open()
 				end
 			end
 		
@@ -59,8 +75,8 @@ function LaptopGUI()
 				end
 			end
 			Files.OnRowRightClick = function( ay, line )
-				print(ay:GetLine(line).file)
-				PrintTable(ay:GetLine(line).file)
+				--print(ay:GetLine(line).file)
+				--PrintTable(ay:GetLine(line).file)
 				local data = ay:GetLine(line).file
 				--print(ay:GetLine(line).Columns[1].asd)
 				local Menu = DermaMenu()
@@ -71,7 +87,7 @@ function LaptopGUI()
 				end
 				Menu:AddSpacer()
 
-				Menu:AddOption("Rename", function() RenameGUI(data) end)
+				Menu:AddOption("Rename", function() RenameGUI(data, ay:GetLine(line).Columns[1]) end)
 				Menu:AddOption("Copy")
 				Menu:AddOption("Cut")
 				Menu:AddOption("Delete")
@@ -210,23 +226,32 @@ function WebBrowserGUI()
 		frame:MakePopup()
 
 	local URLBar = vgui.Create("DTextEntry", frame)
-		URLBar:Dock(TOP)
-		URLBar:SetSize(300, 20)
+		URLBar:SetSize(550, 20)
+		URLBar:SetPos(5, 29)
 		URLBar:SetText("http://" .. Server.ip .. "/" .. Server.files[2][3][1][3][1][2])
 		URLBar:SetMultiline(true)
 		
 	WebPanel = vgui.Create("DHTML", frame)
-		WebPanel:Dock(FILL)
-		WebPanel:SetHTML([[<link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/twbs/bootstrap/master/dist/css/bootstrap.css">]] .. Server.files[2][3][1][3][1][4] or "something went wrong")
+		WebPanel:SetSize(590, 475)
+		WebPanel:SetPos(5, 50)
+		WebPanel:SetHTML([[<link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/twbs/bootstrap/master/dist/css/bootstrap.css">]] .. Server.files[2][3][1][3][1][4] or "")
 		WebPanel:AddFunction("console", "dologin", function(usr, pass)
 			net.Start("ServerLogin")
 				net.WriteTable({usr, pass, Server.ip})
 			net.SendToServer()
 		end)
 		WebPanel:SetAllowLua(true)
+
+	local WebButton = vgui.Create("DButton", frame)
+		WebButton:SetText("Go")
+		WebButton:SetPos(556, 29)
+		WebButton:SetSize(40, 20)
+		WebButton.DoClick = function()
+			WebPanel:SetHTML([[<link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/twbs/bootstrap/master/dist/css/bootstrap.css">]] .. WebDir(URLBar:GetValue())[4] or "")
+		end
 end
 
-function RenameGUI(tbl)
+function RenameGUI(tbl, node)
 	local frame = vgui.Create("DFrame")
 		frame:SetTitle("Rename")
 		frame:SetSize(250, 65)
@@ -243,9 +268,11 @@ function RenameGUI(tbl)
 		WebButton:SetPos(190, 30)
 		WebButton:SetSize(50, 25)
 		WebButton.DoClick = function()
-		print(tbl)
 			tbl[2] = TextBox:GetValue()
 			frame:Close()
+			if IsValid(node) then
+				node:SetText(TextBox:GetValue())
+			end
 			UpdateServer()
 		end
 end
