@@ -1,48 +1,14 @@
 function LaptopGUI()
 	local frame = vgui.Create("DFrame")
 	frame:SetTitle("Server: " .. Server.ip)
-	frame:SetSize(800, 600)
+	frame:SetSize(600, 400)
 	frame:Center()
 	frame:MakePopup()
 	
-	local URLBar = vgui.Create("DTextEntry", frame)
-		URLBar:SetPos(125, 30)
-		URLBar:SetSize(550, 25)
-		URLBar:SetDisabled(true)
-		URLBar:SetText(Server.ip or "something's wrong")
-		
-	local Submit = vgui.Create("DButton", frame)
-		Submit:SetText("Go")
-		Submit:SetPos(675,30)
-		Submit:SetSize(70,25)
-		Submit.DoClick = function()
-			net.Start("RequestContent")
-				net.WriteString(URLBar:GetValue())
-			net.SendToServer()
-		end
-		
-	local Tabs = vgui.Create("DColumnSheet", frame)
-	Tabs:SetSize(775, 600)
-	Tabs:SetPos(0,65)
-	
-	local tab1 = vgui.Create("DPanel", Tabs)
-		tab1:SetSize(650, 500)
-		
-		WebPanel = vgui.Create("DHTML", tab1)
-			WebPanel:Dock(FILL)
-			WebPanel:SetHTML(Server.website or "something went wrong")
-			WebPanel:AddFunction("console", "dologin", function(usr, pass)
-				net.Start("ServerLogin")
-					net.WriteTable({usr, pass, Server.ip})
-				net.SendToServer()
-			end)
-			WebPanel:SetAllowLua(true)
-			
-	Tabs:AddSheet("Internet", tab1, "icon16/world.png")
-	
-		if Server.files then
-		local tab2 = vgui.Create("DPanel", Tabs)
-			tab2:SetSize(650, 500)
+	if Server.files then
+		local tab2 = vgui.Create("DPanel", frame)
+			tab2:SetSize(590, 365)
+			tab2:SetPos(5,30)
 			local tab21 = vgui.Create("DPanel", Tabs)
 			local tab22 = vgui.Create("DPanel", Tabs)
 			
@@ -75,50 +41,65 @@ function LaptopGUI()
 			Files:AddColumn("File")
 			Files:AddColumn("Version")
 			Files:AddColumn("Size")
-			FileTree.DoClick = function(_, node)
+			Files:SetMouseInputEnabled(true)
+			FileTree.DoClick = function(wut, node)
 			Files:Clear()
 				if node == rootfolder then
 					for i=1, #Server.files do
 						if Server.files[i][1] == true then
-							Files:AddLine(Server.files[i][2], Server.files[i][3], Server.files[i][4])
+							Files:AddLine(Server.files[i][2], Server.files[i][3], string.len(Server.files[i][4]) .. " Bytes").file = Server.files[i]
 						end
 					end
 				elseif node.files then
 					for i=1, #node.files do
 						if node.files[i][1] == true then
-							Files:AddLine(node.files[i][2], node.files[i][3], node.files[i][4])
+							Files:AddLine(node.files[i][2], node.files[i][3], string.len(node.files[i][4]) .. " Bytes").file = node.files[i]
 						end
 					end
 				end
 			end
-			
+			Files.OnRowRightClick = function( ay, line )
+				print(ay:GetLine(line).file)
+				PrintTable(ay:GetLine(line).file)
+				local data = ay:GetLine(line).file
+				--print(ay:GetLine(line).Columns[1].asd)
+				local Menu = DermaMenu()
+				if ay:GetLine(line).Columns[1].Value:Split(".")[2] == "exe" then
+					Menu:AddOption("Run")
+				else
+					Menu:AddOption("Edit with Note++", function() NotepadGUI(data) end)
+				end
+				Menu:AddSpacer()
+
+				Menu:AddOption("Rename", function() RenameGUI(data) end)
+				Menu:AddOption("Copy")
+				Menu:AddOption("Cut")
+				Menu:AddOption("Delete")
+				Menu:Open()
+			end
+			Files.DoDoubleClick = function( ay, line )
+				local data = ay:GetLine(line).file
+				if ay:GetLine(line).Columns[1].Value:Split(".")[2] == "exe" then
+					chat.AddText("running " .. ay:GetLine(line).Columns[1].Value)
+				else
+					NotepadGUI(data)
+				end
+			end
+		
 		local Devider = vgui.Create("DHorizontalDivider", tab2)
 			Devider:Dock(FILL)
 			Devider:SetLeft(tab21)
 			Devider:SetRight(tab22)
 			Devider:SetLeftWidth(150)
 			Devider:SetDividerWidth(4)
-		
-		
-	Tabs:AddSheet("File Explorer", tab2)
+			
 	end
-	
-	local tab3 = vgui.Create("DPanel", Tabs)
-		tab3:SetSize(650, 500)
-		
-	Tabs:AddSheet("Task Manager", tab3)
-	
-	local tab4 = vgui.Create("DPanel", Tabs)
-		tab4:SetSize(650, 500)
-		local lol = tab4:GetParent()
-		
-	 Tabs:AddSheet("asd", tab4)
 end
 net.Receive("laptopgui", LaptopGUI)
 
 function ConnectGUI()
 	local frame = vgui.Create("DFrame")
-		frame:SetTitle("GHack Terminal")
+		frame:SetTitle("Personal Computer")
 		frame:SetSize(200, 60)
 		frame:Center()
 		frame:MakePopup()
@@ -139,12 +120,12 @@ net.Receive("connectgui", ConnectGUI)
 
 function MainGUI()
 	local frame = vgui.Create("DFrame")
-		frame:SetTitle("GHack Terminal")
+		frame:SetTitle("Personal Computer")
 		frame:SetSize(300, 200)
 		frame:Center()
 		frame:MakePopup()
 		
-	local URLBar = vgui.Create("DTextEntry", frame)
+	/*local URLBar = vgui.Create("DTextEntry", frame)
 		URLBar:SetPos(10, 30)
 		URLBar:SetSize(275, 25)
 		URLBar:SetText(Server.ip or "something's wrong")
@@ -154,11 +135,19 @@ function MainGUI()
 		ConnectButton:SetPos(10, 60)
 		ConnectButton:SetSize(70, 25)
 		ConnectButton.DoClick = function()
+		end*/
+		
+	local FileButton = vgui.Create("DButton", frame)
+		FileButton:SetText("File Browser")
+		FileButton:SetPos(10, 30)
+		FileButton:SetSize(70, 25)
+		FileButton.DoClick = function()
+			LaptopGUI()
 		end
 		
 	local WebButton = vgui.Create("DButton", frame)
-		WebButton:SetText("Webstie")
-		WebButton:SetPos(85, 60)
+		WebButton:SetText("Web Browser")
+		WebButton:SetPos(85, 30)
 		WebButton:SetSize(70, 25)
 		WebButton.DoClick = function()
 			WebBrowserGUI()
@@ -169,10 +158,49 @@ function MainGUI()
 		TutButton:SetPos(225, 170)
 		TutButton:SetSize(70, 25)
 		TutButton.DoClick = function()
+			chat.AddText("type demos in console for the tutorial")
 		end
 	
 end
 net.Receive("maingui", MainGUI)
+
+function NotepadGUI(tbl)
+	tbl = tbl or {}
+	local frame = vgui.Create("DFrame")
+		frame:SetTitle("Note++")
+		frame:SetSize(600, 500)
+		frame:Center()
+		frame:MakePopup()
+
+	local URLBar = vgui.Create("DTextEntry", frame)
+		URLBar:Dock(FILL)
+		URLBar:SetText(tbl[4])
+		URLBar:SetMultiline(true)
+		
+	local MenuBar = vgui.Create("DMenuBar", frame)
+		MenuBar:DockMargin(-3, -6, -3, 0)
+
+	local M1 = MenuBar:AddMenu("File")
+		M1:AddOption("New", function() 
+			Msg("Chose File:New\n")
+		end):SetIcon("icon16/page_white_go.png")
+
+		M1:AddOption("Save", function() 
+			tbl[4] = URLBar:GetValue()
+			UpdateServer()
+		end):SetIcon("icon16/folder_go.png")
+
+	local M2 = MenuBar:AddMenu( "Edit" )
+		M2:AddOption("Copy", function() 
+			Msg("Chose Edit:Copy\n")
+		end)
+
+	local M3 = MenuBar:AddMenu("Help")
+		M3:AddOption("About", function() 
+			Msg("Chose Help:About\n")
+		end)
+		
+end
 
 function WebBrowserGUI()
 	local frame = vgui.Create("DFrame")
@@ -180,14 +208,44 @@ function WebBrowserGUI()
 		frame:SetSize(600, 500)
 		frame:Center()
 		frame:MakePopup()
+
+	local URLBar = vgui.Create("DTextEntry", frame)
+		URLBar:Dock(TOP)
+		URLBar:SetSize(300, 20)
+		URLBar:SetText("http://" .. Server.ip .. "/" .. Server.files[2][3][1][3][1][2])
+		URLBar:SetMultiline(true)
 		
 	WebPanel = vgui.Create("DHTML", frame)
 		WebPanel:Dock(FILL)
-		WebPanel:SetHTML(Server.website or "something went wrong")
+		WebPanel:SetHTML([[<link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/twbs/bootstrap/master/dist/css/bootstrap.css">]] .. Server.files[2][3][1][3][1][4] or "something went wrong")
 		WebPanel:AddFunction("console", "dologin", function(usr, pass)
 			net.Start("ServerLogin")
 				net.WriteTable({usr, pass, Server.ip})
 			net.SendToServer()
 		end)
 		WebPanel:SetAllowLua(true)
+end
+
+function RenameGUI(tbl)
+	local frame = vgui.Create("DFrame")
+		frame:SetTitle("Rename")
+		frame:SetSize(250, 65)
+		frame:Center()
+		frame:MakePopup()
+
+	local TextBox = vgui.Create("DTextEntry", frame)
+		TextBox:SetPos(5, 30)
+		TextBox:SetSize(180, 25)
+		TextBox:SetText(tbl[2])
+
+	local WebButton = vgui.Create("DButton", frame)
+		WebButton:SetText("OK")
+		WebButton:SetPos(190, 30)
+		WebButton:SetSize(50, 25)
+		WebButton.DoClick = function()
+		print(tbl)
+			tbl[2] = TextBox:GetValue()
+			frame:Close()
+			UpdateServer()
+		end
 end

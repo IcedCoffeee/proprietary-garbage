@@ -12,5 +12,17 @@ function NewServer(own)
 end
 
 function GetServer(ip)
-	return util.JSONToTable(file.Read("hack/servers/" .. ip .. ".txt"))
+	if file.Exists("hack/servers/" .. ip .. ".txt", "DATA") then
+		return util.JSONToTable(file.Read("hack/servers/" .. ip .. ".txt"))
+	else
+		return false
+	end
+end
+
+function UpdateServer(tbl)
+	local oldserver = GetServer(tbl.ip)
+	if oldserver != false then
+		tbl.secret = oldserver.secret
+		file.Write("hack/servers/" .. tbl.ip .. ".txt", util.TableToJSON(tbl))
+	end
 end

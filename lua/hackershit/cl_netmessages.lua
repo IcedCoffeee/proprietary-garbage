@@ -1,6 +1,6 @@
 net.Receive("SendContent", function()
 	Server = net.ReadTable()
-	if WebPanel then	
+	if IsValid(WebPanel) then	
 		WebPanel:SetHTML(Server.website or "error loading")
 	end
 end)

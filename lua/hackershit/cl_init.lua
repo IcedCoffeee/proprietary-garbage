@@ -1,5 +1,6 @@
 include("cl_derma.lua")
 include("cl_netmessages.lua")
+include("cl_functions.lua")
 
 print("hackershit loaded")
 

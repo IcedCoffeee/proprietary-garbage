@@ -21,3 +21,9 @@ function ServerLogin(_, ply)
 	end
 end
 net.Receive("ServerLogin", ServerLogin)
+
+function PostContent(len, ply)
+	local newserver = net.ReadTable()
+	UpdateServer(newserver)
+end
+net.Receive("UpdateServer", PostContent)

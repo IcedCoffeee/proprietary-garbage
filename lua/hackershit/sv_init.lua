@@ -6,6 +6,7 @@ include("sv_defaults.lua")
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("cl_derma.lua")
 AddCSLuaFile("cl_netmessages.lua")
+AddCSLuaFile("cl_functions.lua")
 
 util.AddNetworkString("laptopgui")
 util.AddNetworkString("maingui")
@@ -14,6 +15,7 @@ util.AddNetworkString("RequestContent")
 util.AddNetworkString("SendContent")
 util.AddNetworkString("ServerLogin")
 util.AddNetworkString("MyIP")
+util.AddNetworkString("UpdateServer")
 
 hook.Add("Initialize", "hack_init", function()
 	if(!file.IsDir("hack", "DATA") or !file.IsDir("hack/servers", "DATA") or !file.IsDir("hack/players", "DATA")) then
@@ -24,4 +26,3 @@ hook.Add("Initialize", "hack_init", function()
 end)
 
 print("hacker shit loaded")
-
