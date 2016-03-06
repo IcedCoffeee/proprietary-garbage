@@ -31,7 +31,6 @@ end
 
 function ENT:Use(activator)	
 	if activator:GetPos():Distance(self:GetPos()) < 100 then
-		activator:SendContent(GetServer(self:GetNWString("ip")))
 		net.Start("MainGUI")
 		net.Send(activator)
 	end

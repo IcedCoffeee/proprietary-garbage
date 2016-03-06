@@ -11,11 +11,12 @@ AddCSLuaFile("cl_functions.lua")
 util.AddNetworkString("laptopgui")
 util.AddNetworkString("maingui")
 util.AddNetworkString("connectgui")
-util.AddNetworkString("RequestContent")
-util.AddNetworkString("SendContent")
-util.AddNetworkString("ServerLogin")
 util.AddNetworkString("MyIP")
-util.AddNetworkString("UpdateServer")
+util.AddNetworkString("OpenDir")
+util.AddNetworkString("DirResponse")
+
+resource.AddSingleFile("materials/icedcoffee/file.png")
+resource.AddSingleFile("materials/icedcoffee/folder.png")
 
 hook.Add("Initialize", "hack_init", function()
 	if(!file.IsDir("hack", "DATA") or !file.IsDir("hack/servers", "DATA") or !file.IsDir("hack/players", "DATA")) then

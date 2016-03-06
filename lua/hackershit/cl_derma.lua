@@ -1,115 +1,111 @@
 function LaptopGUI()
+	dir = "/"
 	local frame = vgui.Create("DFrame")
-	frame:SetTitle("Server: " .. Server.ip)
+	frame:SetTitle("Server: " )
 	frame:SetSize(600, 400)
 	frame:Center()
 	frame:MakePopup()
-	
-	if Server.files then
-		local tab2 = vgui.Create("DPanel", frame)
-			tab2:SetSize(590, 365)
-			tab2:SetPos(5,30)
-			local tab21 = vgui.Create("DPanel", Tabs)
-			local tab22 = vgui.Create("DPanel", Tabs)
-			
-		function listdir(node)
-			if node.files then
-				for i=1, #node.files do
-					if node.files[i][1] == false then
-						local temp = node:AddNode(node.files[i][2])
-						temp.files = node.files[i][3]
-						temp.self = node.files[i]
-						listdir(temp)
-					end
-				end
+
+	local MenuBar = vgui.Create("DMenuBar", frame)
+		MenuBar:DockMargin(-3, -6, -3, 0)
+		MenuBar:Dock(TOP)
+
+	local M1 = MenuBar:AddMenu("File")
+		M1:AddOption("New", function() 
+			Msg("Chose File:New\n")
+		end):SetIcon("icon16/page_white_go.png")
+
+		M1:AddOption("Save", function() 
+			Msg("jews")
+		end):SetIcon("icon16/folder_go.png")
+
+	local M2 = MenuBar:AddMenu( "Edit" )
+		M2:AddOption("Copy", function() 
+			Msg("Chose Edit:Copy\n")
+		end)
+
+	local M3 = MenuBar:AddMenu("Help")
+		M3:AddOption("About", function() 
+			Msg("Chose Help:About\n")
+		end)
+
+	local navbar = vgui.Create("DPanel", frame)
+		navbar:Dock(TOP)
+		navbar:DockMargin(-3, 0, -3, 1)
+		navbar:DockPadding(-1, -1, -1, -1)
+
+	local back = vgui.Create("DButton", navbar)
+		back:Dock(LEFT)
+		back:SetText("Back")
+		back.DoClick = function()
+			OpenDir("..")
+		end
+
+	local go = vgui.Create("DButton", navbar)
+		go:Dock(LEFT)
+		go:SetText("Go")
+
+	local Directory = vgui.Create("DTextEntry", navbar)
+		Directory:Dock(FILL)
+		Directory:SetText("/")
+		function setaddressbar(thing)
+			Directory:SetText(thing)
+		end
+
+	local Panel = vgui.Create("DPanel", frame)
+		Panel:Dock(FILL)
+		Panel:DockMargin(-3, 0, -3, -3)
+
+	local IconList = vgui.Create("DPanelList", Panel) 
+		IconList:Dock(FILL)
+		//IconList:SetAutoSize(true)
+		IconList:EnableVerticalScrollbar(true) 
+		IconList:EnableHorizontal(true) 
+		IconList:SetSpacing(8)
+		IconList:SetPadding(4)
+		--IconList:SetSize( 0, 150 )
+		reloadfiles = function()
+		IconList:Clear()
+		for k,v in pairs(CurrentDir) do
+			if not v[1] then
+				local border = vgui.Create("DPanel", IconList)
+					border:SetSize(64,75)
+					border:SetDrawBackground(false)
+				local icon = vgui.Create("DImageButton", border) 
+				icon:SetImage("icedcoffee/folder.png")
+				icon:SizeToContents()
+				icon.DoClick = function() OpenDir(v[2]) end
+				local lbl = vgui.Create("DLabel", border)
+					lbl:SetText(v[2])
+					lbl:SetContentAlignment(5)
+					lbl:SetDark(1)
+					lbl:SetPos(0,55)
+				IconList:AddItem(border)
 			end
 		end
-			
-		FileTree = vgui.Create("DTree", tab21)
-			FileTree:Dock(FILL)
-			local rootfolder = FileTree:AddNode("root")
-			for i=1, #Server.files do
-				if Server.files[i][1] == false then
-					local temp = rootfolder:AddNode(Server.files[i][2])
-					temp.files = Server.files[i][3]
-					temp.self = Server.files[i]
-					listdir(temp)
-				end
-			end
-			function FileTree:DoRightClick(node)
-				if node != rootfolder then
-				local Menu = DermaMenu()
-					local SubMenu = Menu:AddSubMenu("New")
-						SubMenu:AddOption("File", function() NewFile(node) end)
-						SubMenu:AddOption("Folder", function() NewFolder(node) end)
-					Menu:AddSpacer()
-					Menu:AddOption("Rename", function() RenameGUI(node.self, node) end)
-					Menu:AddOption("Copy")
-					Menu:AddOption("Cut")
-					Menu:AddOption("Delete")
-					Menu:Open()
-				end
-			end
-		
-		local Files = vgui.Create("DListView", tab22)
-			Files:Dock(FILL)
-			Files:SetMultiSelect(false)
-			Files:AddColumn("File")
-			Files:AddColumn("Version")
-			Files:AddColumn("Size")
-			Files:SetMouseInputEnabled(true)
-			FileTree.DoClick = function(wut, node)
-			Files:Clear()
-				if node == rootfolder then
-					for i=1, #Server.files do
-						if Server.files[i][1] == true then
-							Files:AddLine(Server.files[i][2], Server.files[i][3], string.len(Server.files[i][4]) .. " Bytes").file = Server.files[i]
-						end
-					end
-				elseif node.files then
-					for i=1, #node.files do
-						if node.files[i][1] == true then
-							Files:AddLine(node.files[i][2], node.files[i][3], string.len(node.files[i][4]) .. " Bytes").file = node.files[i]
-						end
-					end
-				end
-			end
-			Files.OnRowRightClick = function( ay, line )
-				--print(ay:GetLine(line).file)
-				--PrintTable(ay:GetLine(line).file)
-				local data = ay:GetLine(line).file
-				--print(ay:GetLine(line).Columns[1].asd)
-				local Menu = DermaMenu()
-				if ay:GetLine(line).Columns[1].Value:Split(".")[2] == "exe" then
-					Menu:AddOption("Run")
-				else
-					Menu:AddOption("Edit with Note++", function() NotepadGUI(data) end)
-				end
-				Menu:AddSpacer()
 
-				Menu:AddOption("Rename", function() RenameGUI(data, ay:GetLine(line).Columns[1]) end)
-				Menu:AddOption("Copy")
-				Menu:AddOption("Cut")
-				Menu:AddOption("Delete")
-				Menu:Open()
-			end
-			Files.DoDoubleClick = function( ay, line )
-				local data = ay:GetLine(line).file
-				if ay:GetLine(line).Columns[1].Value:Split(".")[2] == "exe" then
-					chat.AddText("running " .. ay:GetLine(line).Columns[1].Value)
-				else
-					NotepadGUI(data)
+		for k,v in pairs(CurrentDir) do
+			if v[1] then
+				local border = vgui.Create("DPanel", IconList)
+					border:SetSize(64,75)
+					border:SetDrawBackground(false)
+				local icon = vgui.Create("DImageButton", border) 
+				icon:SetImage("icedcoffee/file.png")
+				icon:SetSize(64,58)
+				icon.DoClick = function() 
+					chat.AddText(v[2] .. " was clicked")
 				end
+				local lbl = vgui.Create("DLabel", border)
+					lbl:SetText(v[2])
+					lbl:SetContentAlignment(5)
+					lbl:SetDark(1)
+					lbl:SetPos(0,55)
+				IconList:AddItem(border)
 			end
-		
-		local Devider = vgui.Create("DHorizontalDivider", tab2)
-			Devider:Dock(FILL)
-			Devider:SetLeft(tab21)
-			Devider:SetRight(tab22)
-			Devider:SetLeftWidth(150)
-			Devider:SetDividerWidth(4)
-			
-	end
+		end
+		end
+		reloadfiles()
+		OpenDir("/")
 end
 net.Receive("laptopgui", LaptopGUI)
 
@@ -232,7 +228,7 @@ function WebBrowserGUI()
 		URLBar:SetMultiline(true)
 		
 	WebPanel = vgui.Create("DHTML", frame)
-		WebPanel:SetSize(590, 475)
+		WebPanel:SetSize(590, 445)
 		WebPanel:SetPos(5, 50)
 		WebPanel:SetHTML([[<link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/twbs/bootstrap/master/dist/css/bootstrap.css">]] .. Server.files[2][3][1][3][1][4] or "")
 		WebPanel:AddFunction("console", "dologin", function(usr, pass)

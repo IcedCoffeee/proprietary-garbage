@@ -1,11 +1,9 @@
-net.Receive("SendContent", function()
-	Server = net.ReadTable()
-	if IsValid(WebPanel) then	
-		WebPanel:SetHTML(Server.website or "error loading")
-	end
+net.Receive("MyIP", function()
+	IP = net.ReadString()
+	CurrentDir = net.ReadTable()
 end)
 
-net.Receive("MyIP", function()
-	MyIP = net.ReadString()
-	Server = net.ReadTable()
+net.Receive("DirResponse", function()
+	CurrentDir = net.ReadTable()
+	reloadfiles()
 end)
