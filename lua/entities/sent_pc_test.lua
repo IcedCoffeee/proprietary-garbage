@@ -31,12 +31,13 @@ end
 
 function ENT:Use(activator)	
 	if activator:GetPos():Distance(self:GetPos()) < 100 then
-		net.Start("MainGUI")
+		net.Start("hacker.openpc")
+			net.WriteEntity(self)
 		net.Send(activator)
 	end
 end
 
-function ENT:SpawnFunction(ply, tr, ClassName)
+/*function ENT:SpawnFunction(ply, tr, ClassName)
 
 	if ( !tr.Hit ) then return end
 
@@ -46,10 +47,11 @@ function ENT:SpawnFunction(ply, tr, ClassName)
 	ent:SetPos( SpawnPos )
 	ent:Spawn()
 	ent:Activate()
-	ent:SetNWString("ip", GetIP(ply))
+	ent.PC = true
+	ent:SetNWString("id", "temp")
 
 	return ent
 
-end
+end*/
 
 end

@@ -11,15 +11,7 @@ function NewServer(own)
 	return newip
 end
 
-function GetServer(ip)
-	if file.Exists("hack/servers/" .. ip .. ".txt", "DATA") then
-		return util.JSONToTable(file.Read("hack/servers/" .. ip .. ".txt"))
-	else
-		return false
-	end
-end
-
-function opendir(ip, path)
+function opendir(pc, path)
 	if path[#path] == "/" and #path > 1 then path = string.sub(path, 1, #path-1) end
 	path = string.Replace(path, "//", "/")
 	local tbl = string.Explode("/", path)
@@ -27,8 +19,8 @@ function opendir(ip, path)
 	local newdir = {}
 	local files = {}
 
-	if GetServer(ip).files then
-		files = GetServer(ip).files
+	if pc:GetFileSystem() then
+		files = pc:GetFileSystem()
 	else
 		return false
 	end
@@ -50,10 +42,10 @@ function opendir(ip, path)
 		if path != "/" then
 			local temp1 = string.Explode("/", path)
 			table.remove(temp1, #temp1)
-			return opendir(ip, "/" .. table.concat(temp1, "/"))
+			return opendir(pc, "/" .. table.concat(temp1, "/"))
 		end
 	else
-		newdir = opendir(ip, dir .. "/" .. path)
+		newdir = opendir(pc, dir .. "/" .. path)
 	end
 
 	for i=1, #tbl do
@@ -99,3 +91,22 @@ function newfile(folder, name)
 	end
 	return false
 end
+
+net.Receive("hacker.opendir", function(len, ply)
+	local pc = net.ReadEntity()
+	local dir = net.ReadString()
+	local response = opendir(pc, dir)
+	--for i=1, #response do
+	--	table.remove(response[i], 3)
+	--end
+	net.Start("hacker.dirresponse")
+		net.WriteTable(response)
+	net.Send(ply)
+end)
+
+net.Receive("hacker.updatefile", function(len, ply)
+	local pc = net.ReadEntity()
+	local file = net.ReadString()
+	local dir = net.ReadString()
+	
+end)

@@ -8,10 +8,10 @@ hook.Add("PlayerInitialSpawn", "hack_initialspawm", function(ply)
 	
 	if(file.Exists("hack/players/" .. ply:SteamID64() .. ".txt", "DATA")) then
 		local data = util.JSONToTable(file.Read("hack/players/" .. ply:SteamID64() .. ".txt", "DATA"))
-		net.Start("MyIP")
+		/*net.Start("MyIP")
 			net.WriteString(data.ip)
 			net.WriteTable(opendir(data.ip, "/"))
-		net.Send(ply)
+		net.Send(ply)*/
 	end
 end)
 

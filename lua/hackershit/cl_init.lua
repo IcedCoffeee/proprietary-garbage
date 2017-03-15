@@ -1,14 +1,11 @@
-include("cl_derma.lua")
-include("cl_netmessages.lua")
-include("cl_functions.lua")
+--global table
+hacker = hacker or {}
+
+include("cl_dermafunctions.lua")
+include("derma/cl_desktop.lua")
+include("derma/cl_filebrowser.lua")
+include("derma/cl_webbrowser.lua")
+include("derma/cl_notepad.lua")
+include("cl_servers.lua")
 
 print("hackershit loaded")
-dir = dir or "/"
-CurrentDir = CurrentDir or {}
-IP = IP or ""
---[[
-local lol = ""
-for w in string.gmatch("255.168.0.1", "((%d+)%.(%d+)%.(%d+)%.(%d+))") do
-	lol = lol .. w
-end
-print(lol)]]--
